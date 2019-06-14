@@ -10,21 +10,28 @@ import React, { Component } from 'react';
 import { AppRegistry, FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default class FlatListBasics extends Component {
+
+  state = {
+    data: []
+  };
+
+  componentWillMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    const response = await fetch('https://ghibliapi.herokuapp.com/films');
+    const json = await response.json();
+    this.setState({data: json})
+  }
+
+
   render() {
     return (
       <View style={styles.container}>
         <FlatList
-          data={[
-            {key: 'Devin'},
-            {key: 'Jackson'},
-            {key: 'James'},
-            {key: 'Joel'},
-            {key: 'John'},
-            {key: 'Jillian'},
-            {key: 'Jimmy'},
-            {key: 'Julie'},
-          ]}
-          renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
+          data={this.state.data}
+          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
         />
       </View>
     );
