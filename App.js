@@ -8,20 +8,78 @@
 
 import React, { Component } from 'react';
 import { AppRegistry, FlatList, StyleSheet, Text, View } from 'react-native';
+import firebase from 'firebase';
 
 export default class FlatListBasics extends Component {
+
+  //initialize Firebase
+
 
   state = {
     data: []
   };
 
   componentWillMount() {
-    this.fetchData();
+    var firebaseConfig = {
+      apiKey: "AIzaSyA8-LKade2X0sWNBPF4UiiVu8s9P-DTP6o",
+      authDomain: "listapp-76e51.firebaseapp.com",
+      databaseURL: "https://listapp-76e51.firebaseio.com",
+      projectId: "listapp-76e51",
+      storageBucket: "listapp-76e51.appspot.com",
+      messagingSenderId: "505740590123",
+      appId: "1:505740590123:web:1f4a3993d5a4933f"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    firebase.database().ref('users/001').set(
+      {
+        name: 'Austin Sun',
+        age: 18
+      }
+    ).then(() => {
+      console.log('Inserted');
+    }).catch((error) => {
+      console.log('Error!');
+    });
+
+    //firebase.database().ref('users')
+    //this.fetchData();
+    this.getData();
+  }
+
+  snapshotToArray(snapshot) {
+    var returnArr = [];
+
+    snapshot.forEach(function(childSnapshot) {
+        var item = childSnapshot.val();
+        //item.key = childSnapshot.key;
+
+        returnArr.push(item);
+    });
+    return returnArr;
+  };
+
+  getData() {
+    //let json;
+    /*const json = firebase.database().ref('users').on('value', function(dataSnapshot) {
+      return snapshotToArray(dataSnapshot)
+    });
+    */
+    const json = firebase.database().ref('users').on('value', (data) => {
+      return data.toJSON();
+    })
+    console.log(json);
+    const newArr = Object.values(json);
+    this.setState({data: newArr})
   }
 
   fetchData = async () => {
-    const response = await fetch('https://ghibliapi.herokuapp.com/films');
-    const json = await response.json();
+    const response = await fetch("https://listapp-76e51.firebaseio.com/users")///firebase.database().ref().toString());
+    const json = await response.text();
+    Object.keys(json).map((key, index) => {
+      const myItem = json[key];
+      return myItem;
+    })
     this.setState({data: json})
   }
 
@@ -31,7 +89,7 @@ export default class FlatListBasics extends Component {
       <View style={styles.container}>
         <FlatList
           data={this.state.data}
-          renderItem={({item}) => <Text style={styles.item}>{item.title}</Text>}
+          renderItem={({item}) => <Text style={styles.item}>{item.name}</Text>}
         />
       </View>
     );
@@ -40,6 +98,7 @@ export default class FlatListBasics extends Component {
 
 const styles = StyleSheet.create({
   container: {
+  marginTop: 30,
    flex: 1,
    paddingTop: 22
   },
