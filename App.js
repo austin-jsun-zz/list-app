@@ -36,15 +36,22 @@ export default class FlatListBasics extends Component {
         name: 'Austin Sun',
         age: 18
       }
-    ).then(() => {
-      console.log('Inserted');
-    }).catch((error) => {
-      console.log('Error!');
-    });
-
+    )
+    firebase.database().ref('users/002').set(
+      {
+        name: 'Chris',
+        age: 40
+      }
+    )
+    firebase.database().ref('users/003').set(
+      {
+        name: 'John',
+        age: 27
+      }
+    )
     //firebase.database().ref('users')
-    //this.fetchData();
-    this.getData();
+    this.fetchData();
+    //this.getData();
   }
 
   snapshotToArray(snapshot) {
@@ -61,26 +68,33 @@ export default class FlatListBasics extends Component {
 
   getData() {
     //let json;
-    /*const json = firebase.database().ref('users').on('value', function(dataSnapshot) {
-      return snapshotToArray(dataSnapshot)
+    const json = firebase.database().ref('users').once('value', function(dataSnapshot) {
+      return dataSnapshot.toJSON()
     });
-    */
-    const json = firebase.database().ref('users').on('value', (data) => {
+    /*const json = firebase.database().ref('users').once('value', (data) => {
       return data.toJSON();
     })
     console.log(json);
     const newArr = Object.values(json);
-    this.setState({data: newArr})
+    */
+    this.setState({data: json})
   }
 
   fetchData = async () => {
-    const response = await fetch("https://listapp-76e51.firebaseio.com/users")///firebase.database().ref().toString());
-    const json = await response.text();
-    Object.keys(json).map((key, index) => {
+    const response = await fetch("https://listapp-76e51.firebaseio.com/users.json")///firebase.database().ref().toString());
+    const json = await response.json();
+    /*Object.keys(json).map((key, index) => {
       const myItem = json[key];
       return myItem;
-    })
-    this.setState({data: json})
+    })*/
+    /*var jsonArray = json.services.map(function(item) {
+      return {
+        key: item.age,
+        label: item.name
+      };
+    });
+    */
+    this.setState({data: Object.values(json)})
   }
 
 
